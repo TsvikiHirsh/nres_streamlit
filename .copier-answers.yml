@@ -1,0 +1,15 @@
+# Changes here will be overwritten by Copier
+_commit: v0.2.0
+_src_path: gh:alan-turing-institute/python-project-template
+coc: our_coc
+email: tsviki.hirsh@gmail.com
+full_name: Tsviki Y. Hirsh
+license: MIT
+min_python_version: '3.8'
+org: http://github.com/TsvikiHirsh/nres_streamlit
+project_name: nres_streamlit
+project_short_description: 'Streamlit server for nres: Simple yet powerful package
+    for fitting of neutron resonances'
+python_name: nres_streamlit
+typing: no_typing
+url: https://github.com/TsvikiHirsh/nres_streamlit
