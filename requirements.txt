@@ -1,0 +1,4 @@
+# Standard dependencies
+numpy
+pandas
+matplotlib
