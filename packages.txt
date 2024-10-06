@@ -1,0 +1,2 @@
+# Install the package from GitHub
+git+https://github.com/TsvikiHirsh/nres.git
