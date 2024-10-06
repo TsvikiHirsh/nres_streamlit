@@ -2,3 +2,6 @@
 numpy
 pandas
 matplotlib
+
+# GitHub-based Python package installation
+git+https://github.com/TsvikiHirsh/nres.git
