@@ -139,8 +139,12 @@ def main():
             add_component()
             st.rerun()
         
-        # Highlighted Plot button
-        if st.button("Plot Cross Sections", key="plot_button", css_class="highlight-button"):
+        # Highlighted Plot button using HTML
+        if st.markdown('<button class="highlight-button" onclick="document.getElementById(\'plot_button\').click();">Plot Cross Sections</button>', unsafe_allow_html=True):
+            st.session_state.plot = True
+        
+        # Hidden button to trigger the plot action
+        if st.button("Plot Cross Sections", key="plot_button", help="Trigger plot action"):
             st.session_state.plot = True
 
         # New Sidebar Inputs for emin, emax, x-scale, and y-scale inside an expander
