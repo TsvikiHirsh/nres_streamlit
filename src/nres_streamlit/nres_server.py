@@ -11,7 +11,7 @@ if 'components' not in st.session_state:
         'type': 'materials',
         'total_weight': 1.0,
         'short_name': '',
-        'split_by': 'isotopes'
+        'split_by': 'elements'
     }]
 if 'next_id' not in st.session_state:
     st.session_state.next_id = 1
@@ -36,7 +36,7 @@ def plot_cross_section(components):
     if xs:  # Only create plot if there are valid components
         xs = CrossSection(xs)
         fig = xs.iplot()
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, use_container_width=False)
     else:
         st.warning("Please select at least one material to plot.")
 
@@ -47,7 +47,7 @@ def add_component():
         'type': 'materials',
         'total_weight': 1.0,
         'short_name': '',
-        'split_by': 'isotopes'
+        'split_by': 'elements'
     })
     st.session_state.next_id += 1
 
