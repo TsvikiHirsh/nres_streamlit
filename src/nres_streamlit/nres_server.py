@@ -111,13 +111,6 @@ def main():
                         remove_component(component['id'])
                         st.rerun()
 
-        # New Sidebar Inputs for emin, emax, x-scale, and y-scale inside an expander
-        with st.expander("Plot Settings", expanded=False):
-            emin = st.number_input("Minimum energy (eV)", value=0.1, min_value=0.0)
-            emax = st.number_input("Maximum energy (eV)", value=1e6, min_value=0.1)
-            scalex = st.selectbox("X-axis scale", options=["linear", "log"], index=1)
-            scaley = st.selectbox("Y-axis scale", options=["linear", "log"], index=1)
-
         # Add material button
         if st.button("+ Add Material"):
             add_component()
@@ -126,6 +119,15 @@ def main():
         # Plot button
         if st.button("Plot Cross Sections"):
             st.session_state.plot = True
+
+        # New Sidebar Inputs for emin, emax, x-scale, and y-scale inside an expander
+        with st.expander("Plot Settings", expanded=False):
+            emin = st.number_input("Minimum energy (eV)", value=0.1, min_value=0.0)
+            emax = st.number_input("Maximum energy (eV)", value=1e6, min_value=0.1)
+            scalex = st.selectbox("X-axis scale", options=["linear", "log"], index=1)
+            scaley = st.selectbox("Y-axis scale", options=["linear", "log"], index=1)
+
+
     
     # Main area
     if 'plot' in st.session_state and st.session_state.plot:
