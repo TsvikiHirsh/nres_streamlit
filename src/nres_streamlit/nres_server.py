@@ -40,6 +40,8 @@ def plot_cross_section(components, emin, emax, scalex, scaley):
         fig = xs.iplot(emin=emin, emax=emax, scalex=scalex, scaley=scaley)
         
         st.plotly_chart(fig, use_container_width=True)
+
+        st.table(xs.weights)
     else:
         st.warning("Please select at least one material to plot.")
 
@@ -133,6 +135,7 @@ def main():
     if 'plot' in st.session_state and st.session_state.plot:
         plot_cross_section(st.session_state.components, emin, emax, scalex, scaley)
         st.session_state.plot = False
+
 
 if __name__ == "__main__":
     main()
