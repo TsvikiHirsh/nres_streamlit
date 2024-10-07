@@ -61,6 +61,28 @@ def remove_component(component_id):
 
 def main():
     st.title("Cross Section Plotting App")
+
+    # Inject custom CSS for the plot button
+    st.markdown("""
+        <style>
+            .highlight-button {
+                background-color: #007BFF;  /* Highlight color */
+                color: white;                /* Text color */
+                border: none;                /* No border */
+                padding: 10px 20px;         /* Padding */
+                text-align: center;          /* Center text */
+                text-decoration: none;       /* No underline */
+                display: inline-block;       /* Inline block */
+                font-size: 16px;            /* Font size */
+                cursor: pointer;             /* Pointer cursor */
+                border-radius: 5px;         /* Rounded corners */
+                transition: background-color 0.3s;  /* Transition effect */
+            }
+            .highlight-button:hover {
+                background-color: #0056b3;  /* Darker shade on hover */
+            }
+        </style>
+    """, unsafe_allow_html=True)
     
     # Sidebar
     with st.sidebar:
@@ -117,8 +139,8 @@ def main():
             add_component()
             st.rerun()
         
-        # Plot button
-        if st.button("Plot Cross Sections"):
+        # Highlighted Plot button
+        if st.button("Plot Cross Sections", key="plot_button", css_class="highlight-button"):
             st.session_state.plot = True
 
         # New Sidebar Inputs for emin, emax, x-scale, and y-scale inside an expander
