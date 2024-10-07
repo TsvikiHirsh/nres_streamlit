@@ -142,6 +142,9 @@ def main():
         # Highlighted Plot button using HTML
         if st.markdown('<button class="highlight-button" onclick="document.getElementById(\'plot_button\').click();">Plot Cross Sections</button>', unsafe_allow_html=True):
             st.session_state.plot = True
+
+        # Hidden button to trigger the plot action
+        st.markdown('<button id="plot_button" style="display:none;">Plot Cross Sections</button>', unsafe_allow_html=True)
         
 
         # New Sidebar Inputs for emin, emax, x-scale, and y-scale inside an expander
@@ -150,12 +153,6 @@ def main():
             emax = st.number_input("Maximum energy (eV)", value=1e6, min_value=0.1)
             scalex = st.selectbox("X-axis scale", options=["linear", "log"], index=1)
             scaley = st.selectbox("Y-axis scale", options=["linear", "log"], index=1)
-
-    # Hidden button to trigger the plot action
-    if st.button("Plot Cross Sections", key="plot_button", help="Trigger plot action"):
-        st.session_state.plot = True
-
-
     
     # Main area
     if 'plot' in st.session_state and st.session_state.plot:
