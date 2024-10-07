@@ -17,7 +17,7 @@ if 'next_id' not in st.session_state:
     st.session_state.next_id = 1
 
 # Helper function to plot cross sections
-def plot_cross_section(components):
+def plot_cross_section(components, emin, emax, scalex, scaley):
     xs = {}
     for component in components:
         if component['material']:  # Only process if material is selected
@@ -35,7 +35,10 @@ def plot_cross_section(components):
     
     if xs:  # Only create plot if there are valid components
         xs = CrossSection(xs)
-        fig = xs.iplot()
+        
+        # Apply the energy limits (emin, emax) to the plot
+        fig = xs.iplot(emin=emin, emax=emax, scalex=scalex, scaley=scaley)
+        
         st.plotly_chart(fig, use_container_width=False)
     else:
         st.warning("Please select at least one material to plot.")
@@ -105,6 +108,13 @@ def main():
                     if st.button("Remove", key=f"remove_{component['id']}"):
                         remove_component(component['id'])
                         st.rerun()
+
+        # New Sidebar Inputs for emin, emax, x-scale, and y-scale
+        st.header("Plot Settings")
+        emin = st.number_input("Minimum energy (eV)", value=0.1, min_value=0.0)
+        emax = st.number_input("Maximum energy (eV)", value=1e6, min_value=0.1)
+        scalex = st.selectbox("X-axis scale", options=["linear", "log"], index=1)
+        scaley = st.selectbox("Y-axis scale", options=["linear", "log"], index=1)
         
         # Add material button
         if st.button("+ Add Material"):
@@ -117,7 +127,7 @@ def main():
     
     # Main area
     if 'plot' in st.session_state and st.session_state.plot:
-        plot_cross_section(st.session_state.components)
+        plot_cross_section(st.session_state.components, emin, emax, scalex, scaley)
         st.session_state.plot = False
 
 if __name__ == "__main__":
