@@ -1,18 +1,11 @@
 # nres_streamlit
 
-Streamlit server for nres: Simple yet powerful package for fitting of neutron resonances
+Streamlit web-app for nres: Simple yet powerful package for fitting of neutron resonances
 
-## Installation
-
-
-From source:
-```bash
-git clone https://github.com/TsvikiHirsh/nres_streamlit
-cd nres_streamlit
-python -m pip install .
-```
 
 ## Usage
+
+*nres* webapp is avialable at [http://nresapp.streamlit.io](http://nresapp.streamlit.io).
 
 
 ## Contributing
