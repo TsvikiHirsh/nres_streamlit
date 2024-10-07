@@ -18,7 +18,7 @@ if 'next_id' not in st.session_state:
 
 # Helper function to plot cross sections
 def plot_cross_section(components, emin, emax, scalex, scaley):
-    xs = {}
+    xs = CrossSection()
     for component in components:
         if component['material']:  # Only process if material is selected
             material_dict = getattr(nres, component['type'])
@@ -26,22 +26,21 @@ def plot_cross_section(components, emin, emax, scalex, scaley):
             total_weight = component['total_weight']
             short_name = component['short_name'] or component['material']  # Use short_name or material name
             split_by = component['split_by']
-            xs[CrossSection.from_material(
+            xs+= CrossSection.from_material(
                 material,
                 total_weight=total_weight,
                 short_name=short_name,
                 splitby=split_by
-            )] = total_weight
+            )
     
     if xs:  # Only create plot if there are valid components
-        xs = CrossSection(xs)
         
         # Apply the energy limits (emin, emax) to the plot
         fig = xs.iplot(emin=emin, emax=emax, scalex=scalex, scaley=scaley)
         
         st.plotly_chart(fig, use_container_width=True)
 
-        st.table(xs.weights)
+        st.table(xs.weights.to_frame("weights"))
     else:
         st.warning("Please select at least one material to plot.")
 
