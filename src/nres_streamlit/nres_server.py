@@ -144,8 +144,7 @@ def main():
             st.session_state.plot = True
 
         # Hidden button to trigger the plot action
-        st.markdown('<button id="plot_button" style="display:none;">Plot Cross Sections</button>', unsafe_allow_html=True)
-        
+        st.markdown('<button id="plot_button" style="display:none;" onclick="window.location.reload();">Plot Cross Sections</button>', unsafe_allow_html=True)
 
         # New Sidebar Inputs for emin, emax, x-scale, and y-scale inside an expander
         with st.expander("Plot Settings", expanded=False):
