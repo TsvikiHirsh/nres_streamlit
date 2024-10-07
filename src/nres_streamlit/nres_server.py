@@ -121,7 +121,7 @@ def main():
         # Highlighted Plot button
         if st.button("Plot Cross Sections", key="plot_button", help="Click to plot the cross sections."):
             st.session_state.plot = True
-        st.write("---")  # Add a divider for better separation
+        # st.write("---")  # Add a divider for better separation
 
         # New Sidebar Inputs for emin, emax, x-scale, and y-scale inside an expander
         with st.expander("Plot Settings", expanded=False):
