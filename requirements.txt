@@ -2,6 +2,7 @@
 numpy
 pandas
 matplotlib
+plotly
 
 # GitHub-based Python package installation
 git+https://github.com/TsvikiHirsh/nres.git
