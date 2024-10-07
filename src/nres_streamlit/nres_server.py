@@ -117,12 +117,11 @@ def main():
             add_component()
             st.rerun()
         
-        # Create a container for the Plot button
-        with st.container():
-            st.write("---")  # Add a divider for better separation
-            # Highlighted Plot button
-            if st.button("Plot Cross Sections", key="plot_button", help="Click to plot the cross sections."):
-                st.session_state.plot = True
+        st.write("---")  # Add a divider for better separation
+        # Highlighted Plot button
+        if st.button("Plot Cross Sections", key="plot_button", help="Click to plot the cross sections."):
+            st.session_state.plot = True
+        st.write("---")  # Add a divider for better separation
 
         # New Sidebar Inputs for emin, emax, x-scale, and y-scale inside an expander
         with st.expander("Plot Settings", expanded=False):
