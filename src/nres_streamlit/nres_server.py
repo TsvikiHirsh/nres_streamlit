@@ -24,7 +24,7 @@ def plot_cross_section(components, emin, emax, scalex, scaley):
             material_dict = getattr(nres, component['type'])
             material = material_dict[component['material']]
             total_weight = component['total_weight']
-            short_name = component['short_name']
+            short_name = component['short_name'] or component['material']  # Use short_name or material name
             split_by = component['split_by']
             xs[CrossSection.from_material(
                 material,
@@ -39,7 +39,7 @@ def plot_cross_section(components, emin, emax, scalex, scaley):
         # Apply the energy limits (emin, emax) to the plot
         fig = xs.iplot(emin=emin, emax=emax, scalex=scalex, scaley=scaley)
         
-        st.plotly_chart(fig, use_container_width=False)
+        st.plotly_chart(fig, use_container_width=True)
     else:
         st.warning("Please select at least one material to plot.")
 
@@ -67,7 +67,9 @@ def main():
         
         # Create an accordion for each component
         for idx, component in enumerate(st.session_state.components):
-            with st.expander(f"Material {idx + 1}", expanded=(idx == len(st.session_state.components) - 1)):
+            # Dynamic expander name based on short name or material name
+            short_name = component['short_name'] or component['material']
+            with st.expander(short_name if short_name else f"Material {idx + 1}", expanded=False):
                 # Type selection
                 component['type'] = st.radio(
                     "Select type",
@@ -97,7 +99,7 @@ def main():
                 )
                 
                 component['total_weight'] = st.number_input(
-                    "Total width",
+                    "Total weight",
                     value=component['total_weight'],
                     min_value=0.0,
                     key=f"weight_{component['id']}"
@@ -109,13 +111,13 @@ def main():
                         remove_component(component['id'])
                         st.rerun()
 
-        # New Sidebar Inputs for emin, emax, x-scale, and y-scale
-        st.header("Plot Settings")
-        emin = st.number_input("Minimum energy (eV)", value=0.1, min_value=0.0)
-        emax = st.number_input("Maximum energy (eV)", value=1e6, min_value=0.1)
-        scalex = st.selectbox("X-axis scale", options=["linear", "log"], index=1)
-        scaley = st.selectbox("Y-axis scale", options=["linear", "log"], index=1)
-        
+        # New Sidebar Inputs for emin, emax, x-scale, and y-scale inside an expander
+        with st.expander("Plot Settings", expanded=False):
+            emin = st.number_input("Minimum energy (eV)", value=0.1, min_value=0.0)
+            emax = st.number_input("Maximum energy (eV)", value=1e6, min_value=0.1)
+            scalex = st.selectbox("X-axis scale", options=["linear", "log"], index=1)
+            scaley = st.selectbox("Y-axis scale", options=["linear", "log"], index=1)
+
         # Add material button
         if st.button("+ Add Material"):
             add_component()
