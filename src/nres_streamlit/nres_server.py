@@ -61,28 +61,6 @@ def remove_component(component_id):
 
 def main():
     st.title("Cross Section Plotting App")
-
-    # Inject custom CSS for the plot button
-    st.markdown("""
-        <style>
-            .highlight-button {
-                background-color: #007BFF;  /* Highlight color */
-                color: white;                /* Text color */
-                border: none;                /* No border */
-                padding: 10px 20px;         /* Padding */
-                text-align: center;          /* Center text */
-                text-decoration: none;       /* No underline */
-                display: inline-block;       /* Inline block */
-                font-size: 16px;            /* Font size */
-                cursor: pointer;             /* Pointer cursor */
-                border-radius: 5px;         /* Rounded corners */
-                transition: background-color 0.3s;  /* Transition effect */
-            }
-            .highlight-button:hover {
-                background-color: #0056b3;  /* Darker shade on hover */
-            }
-        </style>
-    """, unsafe_allow_html=True)
     
     # Sidebar
     with st.sidebar:
@@ -139,12 +117,12 @@ def main():
             add_component()
             st.rerun()
         
-        # Highlighted Plot button using HTML
-        if st.markdown('<button class="highlight-button" onclick="document.getElementById(\'plot_button\').click();">Plot Cross Sections</button>', unsafe_allow_html=True):
-            st.session_state.plot = True
-
-        # Hidden button to trigger the plot action
-        st.markdown('<button id="plot_button" style="display:none;" onclick="window.location.reload();">Plot Cross Sections</button>', unsafe_allow_html=True)
+        # Create a container for the Plot button
+        with st.container():
+            st.write("---")  # Add a divider for better separation
+            # Highlighted Plot button
+            if st.button("Plot Cross Sections", key="plot_button", help="Click to plot the cross sections."):
+                st.session_state.plot = True
 
         # New Sidebar Inputs for emin, emax, x-scale, and y-scale inside an expander
         with st.expander("Plot Settings", expanded=False):
@@ -152,6 +130,8 @@ def main():
             emax = st.number_input("Maximum energy (eV)", value=1e6, min_value=0.1)
             scalex = st.selectbox("X-axis scale", options=["linear", "log"], index=1)
             scaley = st.selectbox("Y-axis scale", options=["linear", "log"], index=1)
+
+
     
     # Main area
     if 'plot' in st.session_state and st.session_state.plot:
