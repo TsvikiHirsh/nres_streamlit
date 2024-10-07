@@ -5,7 +5,7 @@ Streamlit web-app for nres: Simple yet powerful package for fitting of neutron r
 
 ## Usage
 
-*nres* webapp is avialable at [https://nresapp.streamlit.io](http://nresapp.streamlit.io).
+*nres* webapp is avialable at [https://nresapp.streamlit.app](http://nresapp.streamlit.app).
 
 
 ## Contributing
