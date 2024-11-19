@@ -3,7 +3,7 @@ import nres
 import pandas as pd
 from nres.cross_section import CrossSection
 
-# Initialize session state for components if it doesn't exist
+# Initialize session state for components and other flags
 if 'components' not in st.session_state:
     st.session_state.components = [{
         'id': 0,
@@ -59,6 +59,15 @@ def remove_component(component_id):
     st.session_state.components = [comp for comp in st.session_state.components 
                                  if comp['id'] != component_id]
 
+def toggle_instructions():
+    st.session_state.show_instructions = not st.session_state.show_instructions
+
+def next_step():
+    st.session_state.step += 1
+
+def reset_steps():
+    st.session_state.step = 0
+
 def main():
     # Add explanation for users
     st.markdown(""" 
@@ -77,7 +86,7 @@ def main():
     """)
     
     st.title("Cross Section Plotting App")
-    
+
     # Sidebar
     with st.sidebar:
         st.header("Material Selection")
@@ -143,6 +152,9 @@ def main():
             emax = st.number_input("Maximum energy (eV)", value=1e6, min_value=0.1)
             scalex = st.selectbox("X-axis scale", options=["linear", "log"], index=1)
             scaley = st.selectbox("Y-axis scale", options=["linear", "log"], index=1)
+            if st.button("Plot Cross Sections", key="plot_button", help="Click to plot the cross sections."):
+                st.session_state.plot = True
+                next_step()  # Finish the process
 
     # Main area
     if st.session_state.plot:
