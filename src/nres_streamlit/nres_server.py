@@ -57,11 +57,14 @@ def remove_component(component_id):
                                  if comp['id'] != component_id]
 
 def main():
-    # Add a button to toggle the user explanation visibility
-    st.button("Click to Learn How to Use the App", key="show_instructions", use_container_width=True)
+    # Explanation toggle button
+    if 'show_instructions' not in st.session_state:
+        st.session_state.show_instructions = False
 
-    # Display the explanation only when the button is clicked
-    if st.session_state.get("show_instructions", False):
+    if st.button("How to use?", key="show_instructions_button", use_container_width=True):
+        st.session_state.show_instructions = not st.session_state.show_instructions
+
+    if st.session_state.show_instructions:
         st.markdown("""
         ## Welcome to the Cross Section Plotting App!
 
@@ -97,52 +100,76 @@ def main():
         """)
 
     st.title("Cross Section Plotting App")
-    
+
     # Sidebar
     with st.sidebar:
         st.header("Material Selection")
-        
-        # Create an accordion for each component
+
+        # Refresh button in the top right
+        if st.button("Reset All", key="reset_button", help="Click to clear all selections and start over"):
+            st.session_state.components = [{
+                'id': 0,
+                'material': None,
+                'type': 'materials',
+                'total_weight': 1.0,
+                'short_name': '',
+                'split_by': 'elements'
+            }]
+            st.session_state.next_id = 1
+            st.session_state.show_instructions = False
+            st.experimental_rerun()
+
+        # Step-by-step material selection
         for idx, component in enumerate(st.session_state.components):
-            # Dynamic expander name based on short name or material name
-            short_name = component['short_name'] or component['material']
-            with st.expander(short_name if short_name else f"Material {idx + 1}", expanded=False):
-                # Type selection
-                component['type'] = st.radio(
-                    "Select type",
-                    ['materials', 'elements', 'isotopes'],
-                    key=f"type_{component['id']}"
-                )
-                
-                # Material selection
-                material_dict = getattr(nres, component['type'])
-                component['material'] = st.selectbox(
-                    "Select material",
-                    options=list(material_dict.keys()),
-                    key=f"material_{component['id']}"
-                )
-                
-                # Optional fields
-                component['short_name'] = st.text_input(
-                    "Short name (optional)",
-                    value=component['short_name'],
-                    key=f"shortname_{component['id']}"
-                )
-                
-                component['split_by'] = st.selectbox(
-                    "Split by",
-                    options=['materials', 'elements', 'isotopes'],
-                    key=f"splitby_{component['id']}"
-                )
-                
-                # Fix for 'total_weight' input issue (ensuring smooth increment)
-                component['total_weight'] = st.number_input(
-                    "Total weight",
-                    value=component['total_weight'],
-                    min_value=0.0,
-                    step=0.1,
-                    key=f"weight_{component['id']}"
-                )
+            # Step-by-step process - show only the current step
+            with st.expander(f"Material {idx + 1} - {component['short_name'] or 'Select Material'}", expanded=True):
+                # Step 1: Select Type
+                if 'type_selected' not in component:
+                    component['type'] = st.radio(
+                        "Select type",
+                        ['materials', 'elements', 'isotopes'],
+                        key=f"type_{component['id']}"
+                    )
+                    component['type_selected'] = True
+
+                # Step 2: Select Material based on type
+                if 'material_selected' not in component:
+                    material_dict = getattr(nres, component['type'])
+                    component['material'] = st.selectbox(
+                        "Select material",
+                        options=list(material_dict.keys()),
+                        key=f"material_{component['id']}"
+                    )
+                    component['material_selected'] = True
+
+                # Step 3: Short Name (optional)
+                if 'short_name_selected' not in component:
+                    component['short_name'] = st.text_input(
+                        "Short name (optional)",
+                        value=component['short_name'],
+                        key=f"shortname_{component['id']}"
+                    )
+                    component['short_name_selected'] = True
+
+                # Step 4: Split by
+                if 'splitby_selected' not in component:
+                    component['split_by'] = st.selectbox(
+                        "Split by",
+                        options=['materials', 'elements', 'isotopes'],
+                        key=f"splitby_{component['id']}"
+                    )
+                    component['splitby_selected'] = True
+
+                # Step 5: Total weight
+                if 'total_weight_selected' not in component:
+                    component['total_weight'] = st.number_input(
+                        "Total weight",
+                        value=component['total_weight'],
+                        min_value=0.0,
+                        step=0.1,
+                        key=f"weight_{component['id']}"
+                    )
+                    component['total_weight_selected'] = True
 
                 # Remove button
                 if len(st.session_state.components) > 1:
@@ -159,8 +186,8 @@ def main():
         # Highlighted Plot button
         if st.button("Plot Cross Sections", key="plot_button", help="Click to plot the cross sections."):
             st.session_state.plot = True
-        
-        # New Sidebar Inputs for emin, emax, x-scale, and y-scale inside an expander
+
+        # Plot settings
         with st.expander("Plot Settings", expanded=False):
             emin = st.number_input("Minimum energy (eV)", value=0.1, min_value=0.0)
             emax = st.number_input("Maximum energy (eV)", value=1e6, min_value=0.1)
