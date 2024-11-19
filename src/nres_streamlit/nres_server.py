@@ -26,16 +26,17 @@ def plot_cross_section(components, emin, emax, scalex, scaley):
             total_weight = component['total_weight']
             short_name = component['short_name'] or component['material']  # Use short_name or material name
             split_by = component['split_by']
-            xs += CrossSection.from_material(
+            xs+= CrossSection.from_material(
                 material,
                 total_weight=total_weight,
                 short_name=short_name,
                 splitby=split_by
             )
-
+    
     if xs:  # Only create plot if there are valid components
         # Apply the energy limits (emin, emax) to the plot
         fig = xs.iplot(emin=emin, emax=emax, scalex=scalex, scaley=scaley)
+        
         st.plotly_chart(fig, use_container_width=True)
         st.table(xs.weights.to_frame("weights"))
     else:
@@ -53,124 +54,72 @@ def add_component():
     st.session_state.next_id += 1
 
 def remove_component(component_id):
-    st.session_state.components = [comp for comp in st.session_state.components
+    st.session_state.components = [comp for comp in st.session_state.components 
                                  if comp['id'] != component_id]
 
 def main():
-    # Explanation toggle button
-    if 'show_instructions' not in st.session_state:
-        st.session_state.show_instructions = False
+    # Add explanation for users
+    st.markdown("""
+    ## Cross Section Plotting App
 
-    if st.button("How to use?", key="show_instructions_button", use_container_width=True):
-        st.session_state.show_instructions = not st.session_state.show_instructions
-
-    if st.session_state.show_instructions:
-        st.markdown("""
-        ## Welcome to the Cross Section Plotting App!
-
-        This app allows you to visualize cross-section data for various materials, elements, or isotopes. Here's how it works:
-
-        ### **How to Use the App:**
-        
-        1. **Choose Material Type**: First, you need to select the type of material you want to plot:
-            - **Materials**: Predefined materials.
-            - **Elements**: Select individual elements.
-            - **Isotopes**: Select isotopes based on materials or elements.
-        
-        2. **Select a Material**: From the available list, choose the material you want to plot. The options will change based on the material type you select.
-
-        3. **Short Name** (Optional): You can give each material a short name to make the graph labels more readable.
-
-        4. **Adjust Weight**: Specify the **Total Weight** for each material or component. This will influence the resulting plot. Adjust the weight using the input field.
-
-        5. **Plot the Graph**: Once you've added all the materials, hit the **Plot Cross Sections** button to see your results.
-
-        ### **Plot Settings:**
-        - **Energy Range**: You can adjust the energy range for the plot (minimum and maximum).
-        - **Scale**: Choose whether you want the X and Y axes to have a **linear** or **log** scale.
-        
-        Once you've configured your materials and plot settings, press **Plot Cross Sections** to visualize the data!
-
-        ### **Important Tips:**
-        - You can add multiple materials and components, and the app will automatically update the plot.
-        - Use the **Remove** button to delete any unnecessary components.
-        - The short names you provide will be used in the plot for better clarity.
-
-        We hope you find this tool useful for visualizing cross-section data!
-        """)
+    This app allows you to select materials, elements, or isotopes to plot their cross-section data. 
+    The process is simple:
+    1. Choose the material type (materials, elements, or isotopes).
+    2. Select a material from the available list.
+    3. Provide a short name (optional) and specify how the data should be split.
+    4. Adjust the total weight as needed for each component.
+    5. Click on **Plot Cross Sections** to generate the plot.
+    
+    The plot shows the cross-section data for the selected components over the specified energy range.
+    Use the controls to adjust the energy range and scale of the plot.
+    """)
 
     st.title("Cross Section Plotting App")
-
+    
     # Sidebar
     with st.sidebar:
         st.header("Material Selection")
-
-        # Refresh button in the top right
-        if st.button("Reset All", key="reset_button", help="Click to clear all selections and start over"):
-            st.session_state.components = [{
-                'id': 0,
-                'material': None,
-                'type': 'materials',
-                'total_weight': 1.0,
-                'short_name': '',
-                'split_by': 'elements'
-            }]
-            st.session_state.next_id = 1
-            st.session_state.show_instructions = False
-            st.experimental_rerun()
-
-        # Step-by-step material selection
+        
+        # Create an accordion for each component
         for idx, component in enumerate(st.session_state.components):
-            # Step-by-step process - show only the current step
-            with st.expander(f"Material {idx + 1} - {component['short_name'] or 'Select Material'}", expanded=True):
-                # Step 1: Select Type
-                if 'type_selected' not in component:
-                    component['type'] = st.radio(
-                        "Select type",
-                        ['materials', 'elements', 'isotopes'],
-                        key=f"type_{component['id']}"
-                    )
-                    component['type_selected'] = True
-
-                # Step 2: Select Material based on type
-                if 'material_selected' not in component:
-                    material_dict = getattr(nres, component['type'])
-                    component['material'] = st.selectbox(
-                        "Select material",
-                        options=list(material_dict.keys()),
-                        key=f"material_{component['id']}"
-                    )
-                    component['material_selected'] = True
-
-                # Step 3: Short Name (optional)
-                if 'short_name_selected' not in component:
-                    component['short_name'] = st.text_input(
-                        "Short name (optional)",
-                        value=component['short_name'],
-                        key=f"shortname_{component['id']}"
-                    )
-                    component['short_name_selected'] = True
-
-                # Step 4: Split by
-                if 'splitby_selected' not in component:
-                    component['split_by'] = st.selectbox(
-                        "Split by",
-                        options=['materials', 'elements', 'isotopes'],
-                        key=f"splitby_{component['id']}"
-                    )
-                    component['splitby_selected'] = True
-
-                # Step 5: Total weight
-                if 'total_weight_selected' not in component:
-                    component['total_weight'] = st.number_input(
-                        "Total weight",
-                        value=component['total_weight'],
-                        min_value=0.0,
-                        step=0.1,
-                        key=f"weight_{component['id']}"
-                    )
-                    component['total_weight_selected'] = True
-
+            # Dynamic expander name based on short name or material name
+            short_name = component['short_name'] or component['material']
+            with st.expander(short_name if short_name else f"Material {idx + 1}", expanded=False):
+                # Type selection
+                component['type'] = st.radio(
+                    "Select type",
+                    ['materials', 'elements', 'isotopes'],
+                    key=f"type_{component['id']}"
+                )
+                
+                # Material selection
+                material_dict = getattr(nres, component['type'])
+                component['material'] = st.selectbox(
+                    "Select material",
+                    options=list(material_dict.keys()),
+                    key=f"material_{component['id']}"
+                )
+                
+                # Optional fields
+                component['short_name'] = st.text_input(
+                    "Short name (optional)",
+                    value=component['short_name'],
+                    key=f"shortname_{component['id']}"
+                )
+                
+                component['split_by'] = st.selectbox(
+                    "Split by",
+                    options=['materials', 'elements', 'isotopes'],
+                    key=f"splitby_{component['id']}"
+                )
+                
+                component['total_weight'] = st.number_input(
+                    "Total weight",
+                    value=component['total_weight'],
+                    min_value=0.0,
+                    key=f"weight_{component['id']}"
+                )
+                
                 # Remove button
                 if len(st.session_state.components) > 1:
                     if st.button("Remove", key=f"remove_{component['id']}"):
@@ -181,13 +130,13 @@ def main():
         if st.button("+ Add Material"):
             add_component()
             st.rerun()
-
+        
         st.write("---")  # Add a divider for better separation
         # Highlighted Plot button
         if st.button("Plot Cross Sections", key="plot_button", help="Click to plot the cross sections."):
             st.session_state.plot = True
-
-        # Plot settings
+        
+        # New Sidebar Inputs for emin, emax, x-scale, and y-scale inside an expander
         with st.expander("Plot Settings", expanded=False):
             emin = st.number_input("Minimum energy (eV)", value=0.1, min_value=0.0)
             emax = st.number_input("Maximum energy (eV)", value=1e6, min_value=0.1)
