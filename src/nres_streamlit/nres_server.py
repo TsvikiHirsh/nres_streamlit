@@ -34,12 +34,10 @@ def plot_cross_section(components, emin, emax, scalex, scaley):
             )
     
     if xs:  # Only create plot if there are valid components
-        
         # Apply the energy limits (emin, emax) to the plot
         fig = xs.iplot(emin=emin, emax=emax, scalex=scalex, scaley=scaley)
         
         st.plotly_chart(fig, use_container_width=True)
-
         st.table(xs.weights.to_frame("weights"))
     else:
         st.warning("Please select at least one material to plot.")
@@ -60,6 +58,22 @@ def remove_component(component_id):
                                  if comp['id'] != component_id]
 
 def main():
+    # Add explanation for users
+    st.markdown("""
+    ## Cross Section Plotting App
+
+    This app allows you to select materials, elements, or isotopes to plot their cross-section data. 
+    The process is simple:
+    1. Choose the material type (materials, elements, or isotopes).
+    2. Select a material from the available list.
+    3. Provide a short name (optional) and specify how the data should be split.
+    4. Adjust the total weight as needed for each component.
+    5. Click on **Plot Cross Sections** to generate the plot.
+    
+    The plot shows the cross-section data for the selected components over the specified energy range.
+    Use the controls to adjust the energy range and scale of the plot.
+    """)
+
     st.title("Cross Section Plotting App")
     
     # Sidebar
@@ -121,8 +135,7 @@ def main():
         # Highlighted Plot button
         if st.button("Plot Cross Sections", key="plot_button", help="Click to plot the cross sections."):
             st.session_state.plot = True
-        # st.write("---")  # Add a divider for better separation
-
+        
         # New Sidebar Inputs for emin, emax, x-scale, and y-scale inside an expander
         with st.expander("Plot Settings", expanded=False):
             emin = st.number_input("Minimum energy (eV)", value=0.1, min_value=0.0)
@@ -130,13 +143,10 @@ def main():
             scalex = st.selectbox("X-axis scale", options=["linear", "log"], index=1)
             scaley = st.selectbox("Y-axis scale", options=["linear", "log"], index=1)
 
-
-    
     # Main area
     if 'plot' in st.session_state and st.session_state.plot:
         plot_cross_section(st.session_state.components, emin, emax, scalex, scaley)
         st.session_state.plot = False
-
 
 if __name__ == "__main__":
     main()
