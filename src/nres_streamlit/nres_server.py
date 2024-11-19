@@ -60,7 +60,7 @@ def remove_component(component_id):
                                  if comp['id'] != component_id]
 
 def main():
-    st.title("Cross Section Plotting App")
+    st.title("Cross Section Plotting App Updated")
     
     # Sidebar
     with st.sidebar:
