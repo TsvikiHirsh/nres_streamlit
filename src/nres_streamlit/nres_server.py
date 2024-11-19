@@ -26,17 +26,16 @@ def plot_cross_section(components, emin, emax, scalex, scaley):
             total_weight = component['total_weight']
             short_name = component['short_name'] or component['material']  # Use short_name or material name
             split_by = component['split_by']
-            xs+= CrossSection.from_material(
+            xs += CrossSection.from_material(
                 material,
                 total_weight=total_weight,
                 short_name=short_name,
                 splitby=split_by
             )
-    
+
     if xs:  # Only create plot if there are valid components
         # Apply the energy limits (emin, emax) to the plot
         fig = xs.iplot(emin=emin, emax=emax, scalex=scalex, scaley=scaley)
-        
         st.plotly_chart(fig, use_container_width=True)
         st.table(xs.weights.to_frame("weights"))
     else:
@@ -54,25 +53,48 @@ def add_component():
     st.session_state.next_id += 1
 
 def remove_component(component_id):
-    st.session_state.components = [comp for comp in st.session_state.components 
+    st.session_state.components = [comp for comp in st.session_state.components
                                  if comp['id'] != component_id]
 
 def main():
-    # Add explanation for users
-    st.markdown("""
-    ## Cross Section Plotting App
+    # Add a button to toggle the user explanation visibility
+    st.button("Click to Learn How to Use the App", key="show_instructions", use_container_width=True)
 
-    This app allows you to select materials, elements, or isotopes to plot their cross-section data. 
-    The process is simple:
-    1. Choose the material type (materials, elements, or isotopes).
-    2. Select a material from the available list.
-    3. Provide a short name (optional) and specify how the data should be split.
-    4. Adjust the total weight as needed for each component.
-    5. Click on **Plot Cross Sections** to generate the plot.
-    
-    The plot shows the cross-section data for the selected components over the specified energy range.
-    Use the controls to adjust the energy range and scale of the plot.
-    """)
+    # Display the explanation only when the button is clicked
+    if st.session_state.get("show_instructions", False):
+        st.markdown("""
+        ## Welcome to the Cross Section Plotting App!
+
+        This app allows you to visualize cross-section data for various materials, elements, or isotopes. Here's how it works:
+
+        ### **How to Use the App:**
+        
+        1. **Choose Material Type**: First, you need to select the type of material you want to plot:
+            - **Materials**: Predefined materials.
+            - **Elements**: Select individual elements.
+            - **Isotopes**: Select isotopes based on materials or elements.
+        
+        2. **Select a Material**: From the available list, choose the material you want to plot. The options will change based on the material type you select.
+
+        3. **Short Name** (Optional): You can give each material a short name to make the graph labels more readable.
+
+        4. **Adjust Weight**: Specify the **Total Weight** for each material or component. This will influence the resulting plot. Adjust the weight using the input field.
+
+        5. **Plot the Graph**: Once you've added all the materials, hit the **Plot Cross Sections** button to see your results.
+
+        ### **Plot Settings:**
+        - **Energy Range**: You can adjust the energy range for the plot (minimum and maximum).
+        - **Scale**: Choose whether you want the X and Y axes to have a **linear** or **log** scale.
+        
+        Once you've configured your materials and plot settings, press **Plot Cross Sections** to visualize the data!
+
+        ### **Important Tips:**
+        - You can add multiple materials and components, and the app will automatically update the plot.
+        - Use the **Remove** button to delete any unnecessary components.
+        - The short names you provide will be used in the plot for better clarity.
+
+        We hope you find this tool useful for visualizing cross-section data!
+        """)
 
     st.title("Cross Section Plotting App")
     
@@ -113,13 +135,15 @@ def main():
                     key=f"splitby_{component['id']}"
                 )
                 
+                # Fix for 'total_weight' input issue (ensuring smooth increment)
                 component['total_weight'] = st.number_input(
                     "Total weight",
                     value=component['total_weight'],
                     min_value=0.0,
+                    step=0.1,
                     key=f"weight_{component['id']}"
                 )
-                
+
                 # Remove button
                 if len(st.session_state.components) > 1:
                     if st.button("Remove", key=f"remove_{component['id']}"):
@@ -130,7 +154,7 @@ def main():
         if st.button("+ Add Material"):
             add_component()
             st.rerun()
-        
+
         st.write("---")  # Add a divider for better separation
         # Highlighted Plot button
         if st.button("Plot Cross Sections", key="plot_button", help="Click to plot the cross sections."):
