@@ -15,6 +15,8 @@ if 'components' not in st.session_state:
     }]
 if 'next_id' not in st.session_state:
     st.session_state.next_id = 1
+if 'plot' not in st.session_state:
+    st.session_state.plot = False
 
 # Helper function to plot cross sections
 def plot_cross_section(components, emin, emax, scalex, scaley):
@@ -59,7 +61,7 @@ def remove_component(component_id):
 
 def main():
     # Add explanation for users
-    st.markdown("""
+    st.markdown(""" 
     ## Cross Section Plotting App
 
     This app allows you to select materials, elements, or isotopes to plot their cross-section data. 
@@ -73,7 +75,7 @@ def main():
     The plot shows the cross-section data for the selected components over the specified energy range.
     Use the controls to adjust the energy range and scale of the plot.
     """)
-
+    
     st.title("Cross Section Plotting App")
     
     # Sidebar
@@ -124,12 +126,11 @@ def main():
                 if len(st.session_state.components) > 1:
                     if st.button("Remove", key=f"remove_{component['id']}"):
                         remove_component(component['id'])
-                        st.rerun()
-
+                        # No need for rerun, we can just proceed with the next actions.
+        
         # Add material button
         if st.button("+ Add Material"):
             add_component()
-            st.rerun()
         
         st.write("---")  # Add a divider for better separation
         # Highlighted Plot button
@@ -144,9 +145,9 @@ def main():
             scaley = st.selectbox("Y-axis scale", options=["linear", "log"], index=1)
 
     # Main area
-    if 'plot' in st.session_state and st.session_state.plot:
+    if st.session_state.plot:
         plot_cross_section(st.session_state.components, emin, emax, scalex, scaley)
-        st.session_state.plot = False
+        st.session_state.plot = False  # Reset after plot is displayed
 
 if __name__ == "__main__":
     main()
